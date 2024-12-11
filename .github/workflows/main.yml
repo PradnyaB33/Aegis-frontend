@@ -22,12 +22,11 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Decode SECRETS_JSON_FILE and create Kubernetes Secret
+        
+    - name: Set up kubeconfig
       run: |
-        echo "${{ secrets.SECRETS_JSON_FILE }}" | base64 --decode > secrets.json
-        kubectl create secret generic api-keys-secret \
-          --from-file=secrets.json
+        mkdir -p ~/.kube  # Create the .kube directory if it doesn't exist
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
     - name: Deploy frontend to Kubernetes
       run: |
