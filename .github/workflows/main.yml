@@ -16,6 +16,13 @@ jobs:
         mkdir -p ~/.kube  # Ensure the .kube directory exists
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
 
+    - name: Debug kubeconfig
+      run: cat ~/.kube/config
+   
+    - name: Test kubectl connection
+      run: |
+        kubectl get nodes
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
