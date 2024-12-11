@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: pradnyabhaik3/aegis:1.0
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: secrets-volume
+          mountPath: /etc/secrets
+          subPath: secrets.json
+      volumes:
+      - name: secrets-volume
+        secret:
+          secretName: api-keys-secret
