@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <title>AEGIS</title>
+    <style>
+      .preloaderBg {
+        position: fixed;
+        z-index: 10;
+        top: 25%;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+      }
+
+      .preloader {
+        margin: auto;
+        /* background: url("/op.gif") no-repeat center; */
+        background-size: 225px;
+        width: 250px;
+        height: 250px;
+      }
+      .preloader2 {
+        border: 5px solid #1976d2;
+        border-top: 5px solid #d5312f;
+        border-bottom: 5px solid #d5312f;
+        border-radius: 50%;
+        width: 350px;
+        height: 350px;
+        animation: spin 1s ease-in-out infinite;
+        position: relative;
+        margin: auto;
+        top: -280px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <div
+      id="uniqueLoader"
+      class="flex justify-center items-center fixed top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-full h-full backdrop-filter backdrop-blur-sm bg-opacity-30 z-50"
+    >
+      <div class="preloaderBg" id="preloader">
+        <div class="preloader"></div>
+        <div class="preloader2"></div>
+      </div>
+    </div> -->
+
+    <div id="root"></div>
+    <!-- <script>
+      function hideLoader() {
+        var loaderContainer = document.getElementById("uniqueLoader");
+        setTimeout(function () {
+          loaderContainer.style.display = "none";
+        }, 2000);
+      }
+    </script> -->
+    <!-- for  image hit link https://manifest-gen.netlify.app/ -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaA2q3L--j40-GgojdeFSJ4RywKGtFQ2k&libraries=places,drawing"></script>
+    <script
+      type="text/javascript"
+      src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"
+    ></script>
+  </body>
+</html>
