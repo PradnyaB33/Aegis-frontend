@@ -38,6 +38,19 @@ jobs:
       run: |
        kubectl get nodes -o wide
 
+    - name: Debug and Fetch Frontend Service Details
+      run: |
+        echo "Checking if the frontend service exists..."
+        if kubectl get svc frontend; then
+        echo "Fetching Frontend Service NodePort..."
+           NODE_PORT=$(kubectl get svc frontend -o jsonpath='{.spec.ports[0].nodePort}')
+          INTERNAL_IP=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}')
+          echo "Access your application at: http://${INTERNAL_IP}:${NODE_PORT}"
+        else
+          echo "Error: Frontend service not found. Please check your deployment."
+          exit 1
+        fi
+
     - name: Get Frontend Service NodePort
       run: |
         echo "Fetching Frontend Service Details..."
