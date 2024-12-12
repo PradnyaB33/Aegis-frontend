@@ -20,8 +20,8 @@ jobs:
     - name: Set up Kubernetes with KIND
       uses: helm/kind-action@v1.6.0
 
-    - name: Test Kubernetes connection
-      run: kubectl get nodes
+    - name: Set Kubernetes context for KIND
+      run: kubectl cluster-info
         
     - name: Decode SECRETS_JSON_FILE and create Kubernetes Secret
       run: |
@@ -38,33 +38,7 @@ jobs:
       run: |
        kubectl get nodes -o wide
 
-    - name: Debug and Fetch Frontend Service Details
+    - name: Get Kubernetes Services
       run: |
-        echo "Checking if the frontend service exists..."
-        if kubectl get svc frontend; then
-        echo "Fetching Frontend Service NodePort..."
-           NODE_PORT=$(kubectl get svc frontend -o jsonpath='{.spec.ports[0].nodePort}')
-          INTERNAL_IP=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}')
-          echo "Access your application at: http://${INTERNAL_IP}:${NODE_PORT}"
-        else
-          echo "Error: Frontend service not found. Please check your deployment."
-          exit 1
-        fi
-
-    - name: Get Frontend Service NodePort
-      run: |
-        echo "Fetching Frontend Service Details..."
-        kubectl get svc frontend -o jsonpath='{.spec.ports[0].nodePort}{"\n"}'
-        
-    - name: Display Application Access URL
-      run: |
-        NODE_PORT=$(kubectl get svc frontend -o jsonpath='{.spec.ports[0].nodePort}')
-        INTERNAL_IP=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}')
-        echo "Access your application at: http://${INTERNAL_IP}:${NODE_PORT}"
-    - name: Extract Node IPs
-      run: |
-        echo "Internal IPs:"
-        kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
-        
-        echo "External IPs (if any):"
-        kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="ExternalIP")].address}{"\n"}{end}'
+        echo "Listing all Kubernetes services..."
+        kubectl get services
