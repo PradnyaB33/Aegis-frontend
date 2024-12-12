@@ -11,17 +11,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
-        chmod 600 ~/.kube/config
-        
-    - name: Debug Kubernetes API Connection
-      run: |
-        echo "Testing connectivity to Kubernetes API..."
-        curl -k https://kubernetes.docker.internal:6443
-
     - name: Test kubectl connection
       run: kubectl get nodes
 
@@ -30,6 +19,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Set up Kubernetes with KIND
+      uses: helm/kind-action@v1.6.0
+
+    - name: Test Kubernetes connection
+      run: kubectl get nodes
         
     - name: Decode SECRETS_JSON_FILE and create Kubernetes Secret
       run: |
