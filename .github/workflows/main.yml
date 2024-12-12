@@ -46,7 +46,12 @@ jobs:
     - name: Verify Frontend Deployment Image
       run: |
         echo "Checking deployment image details..."
-        kubectl get deployment frontend-deployment -o jsonpath='{.spec.template.spec.containers[0].image}' || echo "Deployment not found or incorrect configuration!"
+        kubectl get deployment frontend -o jsonpath='{.spec.template.spec.containers[0].image}' || echo "Deployment not found or incorrect configuration!"
+    
+    - name: Describe Frontend Deployment
+      run: |
+        echo "Describing the frontend deployment..."
+        kubectl describe deployment frontend || echo "Deployment not found or incorrect configuration!"
 
     - name: List Running Pods
       run: |
