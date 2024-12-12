@@ -17,6 +17,10 @@ jobs:
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
         chmod 600 ~/.kube/config
 
+    - name: Debug DNS resolution
+      run: |
+        nslookup kubernetes.docker.internal
+
     - name: Test kubectl connection
       run: kubectl get nodes
 
