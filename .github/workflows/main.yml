@@ -16,10 +16,11 @@ jobs:
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
         chmod 600 ~/.kube/config
-
-    - name: Debug DNS resolution
+        
+    - name: Debug Kubernetes API Connection
       run: |
-        nslookup kubernetes.docker.internal
+        echo "Testing connectivity to Kubernetes API..."
+        curl -k https://kubernetes.docker.internal:6443
 
     - name: Test kubectl connection
       run: kubectl get nodes
