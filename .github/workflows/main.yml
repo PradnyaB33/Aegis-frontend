@@ -33,3 +33,15 @@ jobs:
       run: |
         kubectl apply -f frontend-deployment.yaml
         kubectl apply -f frontend-service.yaml
+        
+    - name: Get Kubernetes Nodes Info
+      run: |
+       kubectl get nodes -o wide
+
+    - name: Extract Node IPs
+      run: |
+        echo "Internal IPs:"
+        kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}'
+        
+        echo "External IPs (if any):"
+        kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="ExternalIP")].address}{"\n"}{end}'
