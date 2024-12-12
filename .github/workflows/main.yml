@@ -42,3 +42,10 @@ jobs:
       run: |
         echo "Listing all Kubernetes services..."
         kubectl get services
+        
+    - name: Test Frontend Application Accessibility
+      run: |
+        NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+        NODE_PORT=$(kubectl get svc frontend-service -o jsonpath='{.spec.ports[0].nodePort}')
+        echo "Testing application at: http://${NODE_IP}:${NODE_PORT}"
+        curl -I "http://${NODE_IP}:${NODE_PORT}" || echo "Application is not responding!"
