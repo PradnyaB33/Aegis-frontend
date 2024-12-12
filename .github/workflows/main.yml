@@ -31,5 +31,5 @@ jobs:
 
     - name: Deploy frontend to Kubernetes
       run: |
-        kubectl apply -f k8s/frontend-deployment.yaml
-        kubectl apply -f k8s/frontend-service.yaml
+        kubectl apply -f frontend-deployment.yaml
+        kubectl apply -f frontend-service.yaml
