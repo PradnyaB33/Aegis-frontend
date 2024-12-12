@@ -42,19 +42,14 @@ jobs:
       run: |
         echo "Listing all Kubernetes services..."
         kubectl get services
-        
-    - name: Verify Frontend Deployment Image
-      run: |
-        echo "Checking deployment image details..."
-        kubectl get deployment frontend -o jsonpath='{.spec.template.spec.containers[0].image}' || echo "Deployment not found or incorrect configuration!"
-    
-    - name: Describe Frontend Deployment
-      run: |
-        echo "Describing the frontend deployment..."
-        kubectl describe deployment frontend || echo "Deployment not found or incorrect configuration!"
 
-    - name: List Running Pods
+    - name: Describe Pod
       run: |
-        echo "Listing all running pods..."
-        kubectl get pods -o wide
+        POD_NAME=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
+        kubectl describe pod $POD_NAME
+
+    - name: View Pod Logs
+      run: |
+        POD_NAME=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
+        kubectl logs $POD_NAME
 
