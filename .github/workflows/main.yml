@@ -35,16 +35,9 @@ jobs:
       run: |
         kubectl wait --for=condition=available --timeout=600s deployment/frontend
 
-    - name: Install the latest ngrok
+    - name: Download and Install Latest ngrok
       run: |
-        curl -Lo ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-        unzip ngrok.zip
-        sudo mv ngrok /usr/local/bin
-        ngrok version
-        
-    - name: Download and Install the Latest ngrok
-      run: |
-        curl -Lo ngrok.zip https://ngrok-agent.s3.amazonaws.com/ngrok-stable-linux-amd64.zip
+        curl -Lo ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip
         unzip ngrok.zip
         sudo mv ngrok /usr/local/bin
         ngrok version
@@ -58,5 +51,3 @@ jobs:
         nohup ngrok http 8080 &
         sleep 5
         curl -s localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
-
-
