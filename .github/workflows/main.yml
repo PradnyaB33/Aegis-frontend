@@ -42,7 +42,13 @@ jobs:
         unzip ngrok.zip
         sudo mv ngrok /usr/local/bin
         rm ngrok.zip
-
-    - name: Verify ngrok installation
+    - name: Start ngrok Tunnel
       run: |
-        ngrok version
+        nohup ngrok http 8080 &
+        sleep 5
+        ngrok_url=$(curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)
+        echo "ngrok public URL: $ngrok_url"
+  
+    - name: Test the ngrok Tunnel
+      run: |
+        curl $ngrok_url
