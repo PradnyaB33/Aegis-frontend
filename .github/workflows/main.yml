@@ -51,3 +51,9 @@ jobs:
         nohup ngrok http 8080 &
         sleep 5
         curl -s localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
+        ngrok logs
+        curl "$ngrok_url"
+
+
+
+
