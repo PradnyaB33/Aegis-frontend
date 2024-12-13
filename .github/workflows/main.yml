@@ -38,17 +38,17 @@ jobs:
    
     - name: Deploy frontend to Kubernetes
       run: |
-        kubectl apply -n dev -f frontend-deployment.yaml
-        kubectl apply -n dev -f frontend-service.yaml
+        kubectl apply -n kind-chart-testing -f frontend-deployment.yaml
+        kubectl apply -n kind-chart-testing -f frontend-service.yaml
         
     - name: Get Kubernetes Nodes Info
       run: |
-       kubectl get nodes -o wide
+       kubectl get nodes -o wide -n kind-chart-testing
 
     - name: Get Kubernetes Services
       run: |
         echo "Listing all Kubernetes services..."
-        kubectl get services
+        kubectl get services -n kind-chart-testing
         
     - name: Wait for frontend pod to be ready
       run: |
@@ -56,5 +56,5 @@ jobs:
 
     - name: list pods
       run: |
-        kubectl get pods -n default 
+        kubectl get pods -n kind-chart-testing
 
