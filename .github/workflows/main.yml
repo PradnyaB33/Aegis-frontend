@@ -18,8 +18,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Set up Kubernetes with KIND
-      uses: helm/kind-action@v1.6.0
-      
+      uses: helm/kind-action@v1.6.0     
         
     - name: Decode SECRETS_JSON_FILE and create Kubernetes Secret
       run: |
@@ -43,10 +42,9 @@ jobs:
         sudo mv ngrok /usr/local/bin
         ngrok version
 
-
     - name: Authenticate ngrok
       run: |
-        ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+          ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
 
     - name: Start ngrok Tunnel
       run: |
