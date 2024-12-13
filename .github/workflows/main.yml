@@ -26,11 +26,6 @@ jobs:
         echo "${{ secrets.SECRETS_JSON_FILE }}" | base64 --decode > secrets.json
         kubectl create secret generic api-keys-secret \
           --from-file=secrets.json
-     
-    - name: Validate Kubernetes YAML
-      run: |
-        kubectl apply --dry-run=client -f frontend-deployment.yaml
-        kubectl apply --dry-run=client -f frontend-service.yaml
    
     - name: Deploy frontend to Kubernetes
       run: |
@@ -43,21 +38,11 @@ jobs:
         
     - name: Install ngrok
       run: |
-        curl -s https://ngrok.com/download | tar -xz
+        curl -Lo ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+        unzip ngrok.zip
         sudo mv ngrok /usr/local/bin
+        rm ngrok.zip
 
-    - name: Expose NodePort via ngrok
+    - name: Verify ngrok installation
       run: |
-        nohup ngrok http 8080 &
-        sleep 5
-
-    - name: Get ngrok Public URL
-      run: |
-        ngrok_url=$(curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url)
-        echo "ngrok public URL: $ngrok_url"
-
-
-
-
-
-
+        ngrok version
