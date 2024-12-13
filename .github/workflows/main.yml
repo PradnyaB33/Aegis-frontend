@@ -48,10 +48,7 @@ jobs:
     - name: list pods
       run: |
         kubectl get pods 
-
-    - name: Port Forward NodePort Service
-      run: |
-        nohup kubectl port-forward svc/my-nodeport-service 8080:80 &
+        nohup kubectl port-forward svc/frontend-service 8080:80 &
         sleep 5
         
     - name: Test Locally
