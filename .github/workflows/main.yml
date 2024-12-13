@@ -35,13 +35,14 @@ jobs:
     - name: Wait for frontend pod to be ready
       run: |
         kubectl wait --for=condition=available --timeout=600s deployment/frontend
-        
-    - name: Install ngrok
+
+    - name: Install the latest ngrok
       run: |
-        curl -Lo ngrok.zip https://ngrok-agent.s3.amazonaws.com/ngrok-stable-linux-amd64.zip
+        curl -Lo ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
         unzip ngrok.zip
         sudo mv ngrok /usr/local/bin
-        rm ngrok.zip
+        ngrok version
+
 
     - name: Authenticate ngrok
       run: |
