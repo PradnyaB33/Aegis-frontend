@@ -59,7 +59,13 @@ jobs:
     - name: View Pod Logs
       run: |
         POD_NAME=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
-        kubectl logs $POD_NAME  
-        
-    - name: Test Locally
-      run: curl http://localhost:8080
+        kubectl logs $POD_NAME     
+   
+    - name: Describe Pod
+      run: |
+        POD_NAME=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
+        kubectl describe pod $POD_NAME
+    - name: View Pod Logs
+      run: |
+        POD_NAME=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
+        kubectl logs $POD_NAME
