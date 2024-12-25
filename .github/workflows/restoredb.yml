@@ -37,7 +37,7 @@ jobs:
     - name: Download Backup from S3 to the created folder
       run: |
         # Download files from S3 into the newly created folder
-        aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/*" "$BACKUP_DIR" --recursive
+        aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/" "$BACKUP_DIR" --recursive
         echo "Backup downloaded to $BACKUP_DIR"
 
     - name: List contents of the backup folder
