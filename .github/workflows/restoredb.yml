@@ -26,32 +26,38 @@ jobs:
         echo "deb http://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
         sudo apt-get update
         sudo apt-get install -y mongodb-org-tools
-
+        
     - name: Create a folder in /tmp for backup
       run: |
-        # Create a new folder in /tmp
         BACKUP_DIR="/tmp/restore"
         mkdir -p "$BACKUP_DIR"
         echo "Created backup directory: $BACKUP_DIR"
+      
+    - name: Verify S3 Bucket Contents
+      run: |
+        echo "Checking contents of S3 bucket..."
+        aws s3 ls s3://backupbucket-dev/
 
     - name: Download Backup from S3 to the created folder
       run: |
-        # Download files from S3 into the newly created folder
-        aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/" "$BACKUP_DIR" --recursive
-        echo "Backup downloaded to $BACKUP_DIR"
+        BACKUP_DIR="/tmp/restore"
+        aws s3 cp s3://backupbucket-dev/ "$BACKUP_DIR" --recursive
+        if [ "$(ls -A $BACKUP_DIR)" ]; then
+          echo "Backup downloaded to $BACKUP_DIR"
+        else
+          echo "No files found in S3 bucket. Exiting..."
+          exit 1
+        fi
 
     - name: List contents of the backup folder
       run: |
-        # List contents of the backup folder to confirm files were downloaded
         ls -R "$BACKUP_DIR" || echo "No files found in $BACKUP_DIR"
 
     - name: Restore Data to MongoDB Atlas
       run: |
-        # Restore the downloaded files to MongoDB Atlas
         mongorestore --uri="${{ secrets.MONGODB_URI }}" --db=dev-db --drop "$BACKUP_DIR"
-
+      
     - name: Clean up backup files
       if: always()
       run: |
-        # Clean up the backup files
         rm -rf "$BACKUP_DIR"
