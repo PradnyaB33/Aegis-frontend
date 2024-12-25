@@ -30,7 +30,11 @@ jobs:
     - name: Download Backup from S3
       run: |
         aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/*" /tmp/restore --recursive
-
+        
+    - name: List files in /tmp after download
+      run: |
+        ls -R /tmp
+        
     - name: Restore Data to MongoDB Atlas
       run: |
         mongorestore --uri="${{ secrets. MONGODB_URI }}" --db=dev-db --drop /tmp/restore
