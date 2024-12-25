@@ -40,6 +40,8 @@ jobs:
          sudo chmod 777 /tmp
          ls -ld /tmp
          ls -l
+         sudo rm -rf /tmp/*
+
 
     - name: Download Backup from S3
       run: |
