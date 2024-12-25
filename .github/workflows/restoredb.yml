@@ -52,11 +52,12 @@ jobs:
     - name: List contents of the backup folder
       run: |
         ls -R "$BACKUP_DIR" || echo "No files found in $BACKUP_DIR"
-
+        
     - name: Restore Data to MongoDB Atlas
       run: |
-        mongorestore --uri="${{ secrets.MONGODB_URI }}" --db=dev-db --drop "$BACKUP_DIR"
-      
+        BACKUP_DIR="/tmp/restore"
+        mongorestore --uri="${{ secrets.MONGODB_URI }}" --nsInclude=dev-db.* --drop "$BACKUP_DIR"
+        
     - name: Clean up backup files
       if: always()
       run: |
