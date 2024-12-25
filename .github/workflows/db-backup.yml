@@ -27,7 +27,7 @@ jobs:
     - name: MongoDB Database Backup
       run: |
         BACKUP_DIR="/tmp/db_backup"
-        mongodump --uri="${{ secrets.MONGODB_URI_QA }}" --db=ats-db --out=$BACKUP_DIR
+        mongodump --uri="${{ secrets.MONGODB_URI }}" --out=$BACKUP_DIR
 
     - name: Upload Backup to S3
       run: |
