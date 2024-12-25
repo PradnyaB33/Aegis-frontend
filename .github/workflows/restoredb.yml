@@ -31,7 +31,7 @@ jobs:
       run: |
         aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/*" /tmp/restore --recursive
 
-    - name: Restore Data to MongoDB Atlas (replication-dev)
+    - name: Restore Data to MongoDB Atlas
       run: |
         mongorestore --uri="${{ secrets. MONGODB_URI }}" --db=dev-db --drop /tmp/restore
 
