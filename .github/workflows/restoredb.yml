@@ -6,6 +6,9 @@ on:
 jobs:
   restore-collection:
     runs-on: ubuntu-latest
+    env:
+      BACKUP_FILE: "/tmp/db_backup"
+      RESTORE_DIR: "/tmp/restore"
 
     steps:
     - name: Checkout repository
@@ -26,39 +29,37 @@ jobs:
         echo "deb http://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
         sudo apt-get update
         sudo apt-get install -y mongodb-org-tools
-        
-    - name: Create a folder in /tmp for backup
-      run: |
-        BACKUP_DIR="/tmp/restore"
-        mkdir -p "$BACKUP_DIR"
-        echo "Created backup directory: $BACKUP_DIR"
-      
-    - name: Verify S3 Bucket Contents
-      run: |
-        echo "Checking contents of S3 bucket..."
-        aws s3 ls s3://backupbucket-dev/
 
-    - name: Download Backup from S3 to the created folder
+    - name: Create Restore Directory
       run: |
-        BACKUP_DIR="/tmp/restore"
-        aws s3 cp s3://backupbucket-dev/ "$BACKUP_DIR" --recursive
-        if [ "$(ls -A $BACKUP_DIR)" ]; then
-          echo "Backup downloaded to $BACKUP_DIR"
+        mkdir -p "$RESTORE_DIR"
+        echo "Created restore directory: $RESTORE_DIR"
+
+    - name: Download Backup from S3 to Restore Directory
+      run: |
+        aws s3 cp s3://backupbucket-dev/ "$RESTORE_DIR" --recursive
+        if [ "$(ls -A $RESTORE_DIR)" ]; then
+          echo "Backup downloaded to $RESTORE_DIR"
         else
           echo "No files found in S3 bucket. Exiting..."
           exit 1
         fi
 
-    - name: List contents of the backup folder
+    - name: List Backup Files
       run: |
-        ls -R "$BACKUP_DIR" || echo "No files found in $BACKUP_DIR"
-        
+        echo "Listing contents of: $RESTORE_DIR"
+        ls -R "$RESTORE_DIR" || echo "No files found in $RESTORE_DIR"
+
     - name: Restore Data to MongoDB Atlas
       run: |
-        BACKUP_DIR="/tmp/restore"
-        mongorestore --uri="${{ secrets.MONGODB_URI }}" --nsInclude=dev-db.* --drop "$BACKUP_DIR"
-        
-    - name: Clean up backup files
+        if [ -d "$RESTORE_DIR/dump" ]; then
+          mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$RESTORE_DIR/dump"
+        else
+          mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$RESTORE_DIR"
+        fi
+
+    - name: Clean Up Backup Files
       if: always()
       run: |
-        rm -rf "$BACKUP_DIR"
+        rm -rf "$RESTORE_DIR"
+        echo "Cleaned up backup files."
