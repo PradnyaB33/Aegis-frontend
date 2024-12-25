@@ -1,0 +1,74 @@
+name: Restore 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  restore-collection:
+    runs-on: ubuntu-latest
+    env:
+      RESTORE_DIR: "/tmp/restore"
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Install MongoDB Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnupg
+        wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+        echo "deb http://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+        sudo apt-get update
+        sudo apt-get install -y mongodb-org-tools
+
+    - name: Create Backup Directory
+      run: |
+        mkdir -p "$RESTORE_DIR/dump"
+        echo "Backup directory created: $RESTORE_DIR/dump"
+
+    - name: Download Backup from S3
+      run: |
+        aws s3 cp s3://${{ secrets.AWS_BUCKET_NAME }}/ "$RESTORE_DIR" --recursive
+        echo "Backup downloaded to $RESTORE_DIR"
+
+    - name: Verify Backup Files
+      run: |
+        ls -R "$RESTORE_DIR" || echo "No files found in $RESTORE_DIR"
+        if [ -z "$(ls -A $RESTORE_DIR)" ]; then
+          echo "Backup directory is empty. Exiting..."
+          exit 1
+        fi
+
+    - name: Move BSON Files to Dump Directory
+      run: |
+        if [ "$(ls -A $RESTORE_DIR/*.bson 2>/dev/null)" ]; then
+          mv $RESTORE_DIR/*.bson $RESTORE_DIR/dump/
+          mv $RESTORE_DIR/*.json $RESTORE_DIR/dump/
+          mv $RESTORE_DIR/*.metadata.json $RESTORE_DIR/dump/
+          echo "Backup files moved to dump directory."
+        else
+          echo "No BSON files found, skipping move."
+        fi
+
+    - name: Restore Database to MongoDB Atlas
+      run: |
+        if [ -d "$RESTORE_DIR/dump" ]; then
+          mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$RESTORE_DIR/dump"
+        else
+          echo "Dump directory not found!"
+          exit 1
+        fi
+
+    - name: Clean Up Backup Files
+      if: always()
+      run: |
+        rm -rf "$RESTORE_DIR"
+        echo "Cleaned up backup files."
