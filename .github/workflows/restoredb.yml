@@ -27,18 +27,31 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y mongodb-org-tools
 
-    - name: Download Backup from S3
+    - name: Create a folder in /tmp for backup
       run: |
-        aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/*" /tmp/restore --recursive
-        
-    - name: List files in /tmp after download
+        # Create a new folder in /tmp
+        BACKUP_DIR="/tmp/restore"
+        mkdir -p "$BACKUP_DIR"
+        echo "Created backup directory: $BACKUP_DIR"
+
+    - name: Download Backup from S3 to the created folder
       run: |
-        ls -R /tmp
-        
+        # Download files from S3 into the newly created folder
+        aws s3 cp "s3://${{ secrets.AWS_BUCKET_NAME }}/*" "$BACKUP_DIR" --recursive
+        echo "Backup downloaded to $BACKUP_DIR"
+
+    - name: List contents of the backup folder
+      run: |
+        # List contents of the backup folder to confirm files were downloaded
+        ls -R "$BACKUP_DIR" || echo "No files found in $BACKUP_DIR"
+
     - name: Restore Data to MongoDB Atlas
       run: |
-        mongorestore --uri="${{ secrets. MONGODB_URI }}" --db=dev-db --drop /tmp/restore
+        # Restore the downloaded files to MongoDB Atlas
+        mongorestore --uri="${{ secrets.MONGODB_URI }}" --db=dev-db --drop "$BACKUP_DIR"
 
     - name: Clean up backup files
+      if: always()
       run: |
-        rm -rf /tmp/restore
+        # Clean up the backup files
+        rm -rf "$BACKUP_DIR"
