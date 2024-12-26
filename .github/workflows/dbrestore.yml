@@ -33,15 +33,14 @@ jobs:
       run: |
         mkdir -p "$RESTORE_DIR/dump"
         echo "Backup directory created: $RESTORE_DIR/dump"
-
-    
+   
     - name: file permission set and list down files
       run: |
+         ls -l
+         cd tmp
          sudo chmod 777 /tmp
          ls -ld /tmp
-         ls -l
-         sudo rm -rf /tmp/*
-
+         ls -lt
 
     - name: Download Backup from S3
       run: |
