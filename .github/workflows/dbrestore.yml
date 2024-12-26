@@ -33,19 +33,6 @@ jobs:
       run: |
         mkdir -p "$RESTORE_DIR/dump"
         echo "Backup directory created: $RESTORE_DIR/dump"
-   
-    - name: file permission set and list down files
-      run: |
-         ls -l
-         cd tmp
-         sudo chmod 777 /tmp
-         ls -ld /tmp
-         ls -lt
-
-    - name: Download Backup from S3
-      run: |
-        aws s3 cp s3://${{ secrets.AWS_BUCKET_NAME }}/ "$RESTORE_DIR" --recursive
-        echo "Backup downloaded to $RESTORE_DIR"
 
     - name: Verify Backup Files
       run: |
@@ -54,6 +41,12 @@ jobs:
           echo "Backup directory is empty. Exiting..."
           exit 1
         fi
+
+    - name: Check MongoDB Data Path
+      run: cat /etc/mongod.conf | grep dbPath    
+            
+    - name: List MongoDB Data Files
+      run: ls -l /var/lib/mongodb
 
     - name: Move BSON Files to Dump Directory
       run: |
