@@ -58,9 +58,12 @@ jobs:
 
     - name: Restore Data to MongoDB Atlas
       run: |
-        if [ -d "$RESTORE_DIR/dump" ]; then
-          mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$RESTORE_DIR/dump"
+        DUMP_DIR="$RESTORE_DIR/dump"
+        if [ -d "$DUMP_DIR" ]; then
+          echo "Restoring from dump directory..."
+          mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$DUMP_DIR"
         else
+          echo "Dump directory not found. Attempting direct restore..."
           mongorestore --uri="${{ secrets.MONGODB_URI }}" --drop "$RESTORE_DIR"
         fi
 
